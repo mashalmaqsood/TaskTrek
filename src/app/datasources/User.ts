@@ -1,7 +1,6 @@
 import UserModel from "../../app/models/User";
 import { MongoDataSource } from "apollo-datasource-mongodb";
 import { ObjectId } from "mongoose";
-import User from "../../app/models/User";
 
 interface UserDocument {
   id: ObjectId;

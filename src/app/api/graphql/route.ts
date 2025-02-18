@@ -4,8 +4,8 @@ import { NextRequest } from "next/server";
 import mongoose from "mongoose";
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
-import Users from "@/app/datasources/User";
-import UserModel from "@/app/models/User";
+import {Users,Tasks} from "@/app/datasources/index"
+import {UserModel,TaskModel}from "@/app/models/index";
 
 const uri = process.env.NEXT_PUBLIC_MONGODB_URI;
 
@@ -34,6 +34,7 @@ const handler = startServerAndCreateNextHandler<NextRequest>(server, {
     res,
     dataSources: {
       users: new Users({ modelOrCollection: UserModel }),
+      tasks: new Tasks({modelOrCollection: TaskModel})
     },
   }),
 });
@@ -43,5 +44,6 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    console.log("requestttt::::",request)
   return handler(request);
 }
