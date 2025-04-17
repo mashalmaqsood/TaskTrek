@@ -44,6 +44,5 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    console.log("requestttt::::",request)
   return handler(request);
 }

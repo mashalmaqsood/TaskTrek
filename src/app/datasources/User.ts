@@ -1,6 +1,7 @@
 import UserModel from "../../app/models/User";
 import { MongoDataSource } from "apollo-datasource-mongodb";
 import { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 
 interface UserDocument {
   id: ObjectId;
@@ -28,9 +29,42 @@ export default class Users extends MongoDataSource<UserDocument> {
     }
   }
 
+  async loginUser({ input }: any) {
+    try {
+      const { id } = input;
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return {
+          success: false,
+          message: "Invalid user ID format",
+          user: null,
+        };
+      }
+
+      const user = await UserModel.findById(id);
+
+      if (user) {
+        return {
+          success: true,
+          message: "User found!",
+          user: {
+            id: user._id,
+            email: user.email,
+          },
+        };
+      } else {
+        return {
+          success: false,
+          message: "User not found",
+          user: null,
+        };
+      }
+    } catch (error) {
+      throw new Error("User Couldn't login!");
+    }
+  }
+
   //Function to update user details
   async updateUser({ input }: any) {
-    console.log("updateUser dataa",input)
     try {
       const updatedUser = await UserModel.findByIdAndUpdate(
         input.id,
@@ -38,7 +72,6 @@ export default class Users extends MongoDataSource<UserDocument> {
         { new: true }
       );
 
-      console.log("updated user",updatedUser);
       return updatedUser;
     } catch (error) {
       throw new Error("Failed to update the user details");
@@ -46,12 +79,12 @@ export default class Users extends MongoDataSource<UserDocument> {
   }
 
   //Function to delete a user record
-  async deleteUser ({ id }: { id: string }) : Promise<string>{
-    try{
+  async deleteUser({ id }: { id: string }): Promise<string> {
+    try {
       await UserModel.findByIdAndDelete(id);
-      return "User record deleted successfully!"
-    }catch(error){
-      throw new Error("Failed to delete user record!")
+      return "User record deleted successfully!";
+    } catch (error) {
+      throw new Error("Failed to delete user record!");
     }
   }
 }

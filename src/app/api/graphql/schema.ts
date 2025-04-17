@@ -52,8 +52,14 @@ const typeDefs = `#graphql
     tasks: [Task]
   }
 
+type AuthPayload{
+  success: Boolean,
+  message: String,
+  user: User
+}
   type Mutation {
     createUser(input: NewUserInput!): User
+    loginUser(input:NewUserInput!):AuthPayload
     updateUser(input: UpdateUserInput!): User
     deleteUser(id: ID!): String
     createTask(input: NewTaskInput!):Task

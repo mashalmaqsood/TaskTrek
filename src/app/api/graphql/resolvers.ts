@@ -26,7 +26,6 @@ const resolvers = {
   Mutation: {
     //mutations for users
     createUser: async (_: any, { input }: any, context: any) => {
-        console.log("create user payloaddd",context)
       try {
         const newUser = await context.dataSources.users.createUser({
           input,
@@ -34,6 +33,14 @@ const resolvers = {
         return newUser;
       } catch (error) {
         throw new Error("Failed to create user");
+      }
+    },
+    loginUser: async (_: any, { input }: any, context: any) => {
+      try {
+        const userLogin = await context.dataSources.users.loginUser({ input });
+        return userLogin;
+      } catch (error) {
+        throw new Error("Failed to login user");
       }
     },
     updateUser: async (_: any, { input }: any, context: any) => {
@@ -80,5 +87,3 @@ const resolvers = {
 };
 
 export default resolvers;
-
-  
