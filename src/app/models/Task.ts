@@ -10,6 +10,11 @@ const taskSchema = new Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserModel",
+      required: [true, "User ID is required"]
+    },
     status: { type: String, enum: ["todo", "in-progress", "completed"], default:"todo"},
     assignee: { type: String, required: true },
     dueDate: { type: String, required: ["All fields are required"] },

@@ -22,11 +22,31 @@ const resolvers = {
         throw new Error("Failed to fetch tasks");
       }
     },
+    getUserTasks: async (
+      _: any,
+      { userId }: { userId: string },
+      context: {
+        user: any;
+        dataSources: { tasks: { getUserTasks: (userId: string) => any } };
+      }
+    ) => {
+      try {
+        if (!context.user) {
+          throw new Error("Not authenticated");
+        }
+        if (context.user.id !== userId) {
+          throw new Error("Forbidden");
+        }
+        console.log("yes it workeddd!!");
+        return context.dataSources.tasks.getUserTasks(userId);
+      } catch (error) {
+        throw new Error("failed to fetch user tasks");
+      }
+    },
   },
   Mutation: {
     //mutations for users
     createUser: async (_: any, { input }: any, context: any) => {
-        console.log("create user payloaddd",context)
       try {
         const newUser = await context.dataSources.users.createUser({
           input,
@@ -34,6 +54,48 @@ const resolvers = {
         return newUser;
       } catch (error) {
         throw new Error("Failed to create user");
+      }
+    },
+    // loginUser: async (_: any, { input }: any, context: any) => {
+    //   try {
+    //     console.log("loginUser context:::",context)
+    //     console.log("tryinggg:::");
+    //     const userLogin = await context.dataSources.users.loginUser({
+    //       input,
+    //       res: context.res,
+    //     });
+    //     console.log("userLogin::::", userLogin);
+    //     return userLogin;
+    //   } catch (error) {
+    //     console.log("login error",error);
+    //     throw new Error("Failed to login user");
+    //   }
+    // },
+
+    loginUser: async (_: any, { input }: any, context: any) => {
+      try {
+        const result = await context.dataSources.users.loginUser({ input });
+        console.log("result::::",result)
+     
+        if (result.token) {
+          context.res.headers.append(
+            "Set-Cookie",
+            `authToken=${
+              result.token
+            }; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax; ${
+              process.env.NODE_ENV === "production" ? "Secure" : ""
+            }`
+          );
+        }
+        console.log("context:::",result.user);
+        return {
+          success: result.success,
+          message: result.message,
+          user: result.user,
+        };
+      } catch (error) {
+        console.log("login error", error);
+        throw new Error("Failed to login user");
       }
     },
     updateUser: async (_: any, { input }: any, context: any) => {
@@ -80,5 +142,3 @@ const resolvers = {
 };
 
 export default resolvers;
-
-  
