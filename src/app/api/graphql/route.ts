@@ -1,11 +1,11 @@
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 import { ApolloServer } from "@apollo/server";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
-import {Users,Tasks} from "@/app/datasources/index"
-import {UserModel,TaskModel}from "@/app/models/index";
+import { Users, Tasks } from "@/app/datasources/index";
+import { UserModel, TaskModel } from "@/app/models/index";
 
 const uri = process.env.NEXT_PUBLIC_MONGODB_URI;
 
@@ -29,14 +29,30 @@ const server: any = new ApolloServer({
 });
 
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {
-  context: async (req, res) => ({
-    req,
-    res,
-    dataSources: {
-      users: new Users({ modelOrCollection: UserModel }),
-      tasks: new Tasks({modelOrCollection: TaskModel})
-    },
-  }),
+  context: async (req) => {
+    const res = new NextResponse();
+    let user = null;
+    const token = req.cookies.get("authToken")?.value;
+
+    if (token) {
+      try {
+        const jwt = require("jsonwebtoken");
+        user = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (e) {
+        console.warn("Invalid token");
+      }
+    }
+
+    return {
+      req,
+      res,
+      user,
+      dataSources: {
+        users: new Users({ modelOrCollection: UserModel }),
+        tasks: new Tasks({ modelOrCollection: TaskModel }),
+      },
+    };
+  },
 });
 
 export async function GET(request: NextRequest) {

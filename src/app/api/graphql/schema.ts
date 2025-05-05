@@ -10,7 +10,8 @@ const typeDefs = `#graphql
      title: String!,
      description: String!,
      priority: String!,
-     status : String!,
+     userId: String!,
+     status: String!,
      assignee: String!,
      dueDate: String
   }
@@ -32,7 +33,8 @@ const typeDefs = `#graphql
      title: String!,
      description: String!,
      priority: String!,
-     status : String!,
+     userId:String,
+     status: String!,
      assignee: String!,
      dueDate: String
   }
@@ -42,21 +44,29 @@ const typeDefs = `#graphql
      title: String,
      description: String,
      priority: String,
-     status : String,
+     status: String,
      assignee: String,
      dueDate: String
-  }
+ }
 
-  type Query {
+type TaskResult {
+  success: Boolean,
+  message: String,
+  tasks: [Task] 
+}
+
+type Query {
     users: [User],
-    tasks: [Task]
-  }
+    tasks: [Task],
+    getUserTasks(userId: String): [Task]
+}
 
-type AuthPayload{
+  type AuthPayload{
   success: Boolean,
   message: String,
   user: User
 }
+
   type Mutation {
     createUser(input: NewUserInput!): User
     loginUser(input:NewUserInput!):AuthPayload
@@ -66,6 +76,6 @@ type AuthPayload{
     updateTask(input:UpdateTaskInput!):Task
     deleteTask(id:ID!):String
   }
-`;
+  `;
 
 export default typeDefs;

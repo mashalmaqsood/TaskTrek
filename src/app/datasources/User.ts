@@ -3,6 +3,8 @@ import { MongoDataSource } from "apollo-datasource-mongodb";
 import { ObjectId } from "mongoose";
 import mongoose from "mongoose";
 
+const jwt = require("jsonwebtoken");
+
 interface UserDocument {
   id: ObjectId;
   email: string;
@@ -29,38 +31,41 @@ export default class Users extends MongoDataSource<UserDocument> {
     }
   }
 
-  async loginUser({ input }: any) {
-    try {
-      const { id } = input;
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        return {
-          success: false,
-          message: "Invalid user ID format",
-          user: null,
-        };
-      }
+  // Inside Users data source
+  async loginUser({ input }: { input: any }) {
+    const { id } = input;
 
-      const user = await UserModel.findById(id);
-
-      if (user) {
-        return {
-          success: true,
-          message: "User found!",
-          user: {
-            id: user._id,
-            email: user.email,
-          },
-        };
-      } else {
-        return {
-          success: false,
-          message: "User not found",
-          user: null,
-        };
-      }
-    } catch (error) {
-      throw new Error("User Couldn't login!");
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return {
+        success: false,
+        message: "Invalid user ID format",
+        user: null,
+        token: null,
+      };
     }
+
+    const user = await UserModel.findById(id);
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+        user: null,
+        token: null,
+      };
+    }
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.NEXT_PUBLIC_JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return {
+      success: true,
+      message: "Logged in!",
+      user: { id: user._id, email: user.email },
+      token,
+    };
   }
 
   //Function to update user details

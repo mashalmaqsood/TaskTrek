@@ -1,12 +1,13 @@
 import TaskModel from "../models/Task";
 import { MongoDataSource } from "apollo-datasource-mongodb";
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 interface TaskDocument {
   id: ObjectId;
   title: string;
   description: string;
   priority: string;
+  userId: ObjectId;
   status: string;
   assignee: string;
   dueDate: Date;
@@ -52,6 +53,22 @@ export default class Tasks extends MongoDataSource<TaskDocument> {
       return "Task deleted successfully!";
     } catch (error) {
       throw new Error("Failed to delete the task!");
+    }
+  }
+
+  async getUserTasks(userId: string) {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return {
+          successs: false,
+          message: "Invalid user Id format",
+          tasks: [],
+        };
+      }
+      const tasks = await TaskModel.find({ userId });
+      return tasks;
+    } catch (error) {
+      throw new Error("Failed to retrieve user tasks");
     }
   }
 }
