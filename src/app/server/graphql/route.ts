@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
-import { Users, Tasks } from "@/app/datasources/index";
-import { UserModel, TaskModel } from "@/app/models/index";
+import { Users, Tasks } from "../datasources/index";
+import { UserModel, TaskModel } from "@/app/server/models/index";
 
 const uri = process.env.NEXT_PUBLIC_MONGODB_URI;
 

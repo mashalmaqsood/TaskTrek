@@ -1,4 +1,4 @@
-import UserModel from "../../app/models/User";
+import UserModel from "../models/User";
 import { MongoDataSource } from "apollo-datasource-mongodb";
 import { ObjectId } from "mongoose";
 import mongoose from "mongoose";

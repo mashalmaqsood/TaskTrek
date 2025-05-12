@@ -6,6 +6,7 @@ const resolvers = {
       context: { dataSources: { users: { getAllUsers: () => any } } }
     ) => {
       try {
+        console.log("working userss:::")
         return context.dataSources.users.getAllUsers();
       } catch (error) {
         throw new Error("Failed to fetch users");
